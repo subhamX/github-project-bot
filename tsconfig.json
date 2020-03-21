@@ -1,0 +1,6 @@
+{
+    "compilerOptions": {
+        "target": "ES3",
+        "watch": true
+    }
+}
