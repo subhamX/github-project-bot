@@ -104,16 +104,34 @@ function constructAuthToken(uName, SECRET_TOKEN) {
 async function main() {
     try {
         // REPO_URL contains the repository URL
-        let REPO_URL = 'https://github.com/hercules-iitrpr/test-project-automation'
+        // let REPO_URL = 'https://github.com/hercules-iitrpr/test-project-automation'
+        let REPO_URL = core.getInput('REPO_URL');
+        if (!REPO_URL) {
+            throw Error('No REPO_URL passed')
+        }
         // PROJECT_URL contains the project URL
-        let PROJECT_URL = 'https://github.com/orgs/hercules-iitrpr/projects/1';
-        // COLUMN_NAME => column name into which Community Pull Requests Needs to be added 
-        let COLUMN_NAME = "In Progress (Community)";
-        let currentHours = new Date().getHours();
+        // let PROJECT_URL = 'https://github.com/orgs/hercules-iitrpr/projects/1';
+        let PROJECT_URL = core.getInput('PROJECT_URL');
+        if (!PROJECT_URL) {
+            throw Error('No PROJECT_URL passed')
+        }
+        // COLUMN_NAME => Name of the column into which Pull Requests Needs to be added 
+        // let COLUMN_NAME = "In Progress (Community)";
+        let COLUMN_NAME = core.getInput('COLUMN_NAME');
+        if (!COLUMN_NAME) {
+            throw Error('No COLUMN_NAME passed')
+        }
         // SECRET_TOKEN contains the ACCESS TOKEN
-        let SECRET_TOKEN = '<--TEST-SECRET-TOKEN-->'
+        // let SECRET_TOKEN = '<--TEST-SECRET-TOKEN-->'
+        let SECRET_TOKEN = core.getInput('SECRET_TOKEN');
+        if (!SECRET_TOKEN) {
+            throw Error('No SECRET_TOKEN passed')
+        }
+        // storing current Hours
+        let currentHours = new Date().getHours();
         // Hours to consider
         let HOURS_FLAG = 5
+
         let { projectEndpoint } = constructProjectEndpoint(PROJECT_URL);
         let { pullReqListEndpoint, uName } = constructPullReqListEndpoint(REPO_URL);
         console.log(`Project Endpoint ${projectEndpoint}`)
