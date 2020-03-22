@@ -3,22 +3,13 @@ import * as github from '@actions/github';
 import * as fetch from 'node-fetch';
 import * as fs from 'fs';
 
-// REPO_URL contains the repository URL
-let REPO_URL = 'https://github.com/hercules-iitrpr/test-project-automation'
-// PROJECT_URL contains the project URL
-let PROJECT_URL = 'https://github.com/orgs/hercules-iitrpr/projects/1';
-// COLUMN_NAME => column name into which Community Pull Requests Needs to be added 
-let COLUMN_NAME = "In Progress (Community)";
-let currentHours = new Date().getHours();
-// SECRET_TOKEN contains the ACCESS TOKEN
-let SECRET_TOKEN = '<--TEST-SECRET-TOKEN-->'
-// Hours to consider
-let HOURS_FLAG = 5
 
+// RegExp Expressions of correct repo and project URL
 let projectUrlRegex = /https:\/\/github.com\/(orgs|users)\/([^/]+)\/projects\/([\d]+)/;
 let repoUrlRegex = /https:\/\/github.com\/([^/]+)\/([^/]+)\/?/;
 
-async function updatePullRequests(pullReqListEndpoint, cardEndpoint, authToken) {
+// Function to iterate the pullRequests and update the Project Column
+async function updateProjectColumn(pullReqListEndpoint, cardEndpoint, authToken, COLUMN_NAME, currentHours, HOURS_FLAG) {
     try {
         let res = await fetch(pullReqListEndpoint, {})
         let json: Array<any> = await res.json();
@@ -38,7 +29,7 @@ async function updatePullRequests(pullReqListEndpoint, cardEndpoint, authToken) 
 
 
 // Function verifies the projectEndpoint and returns the columnEndpoint of desired project
-async function getColumnEndpoint(projectEndpoint: string) {
+async function getColumnEndpoint(projectEndpoint: string, PROJECT_URL) {
     let res = await fetch(projectEndpoint, {
         'headers': {
             'Accept': 'application/vnd.github.inertia-preview+json'
@@ -61,6 +52,7 @@ async function getColumnEndpoint(projectEndpoint: string) {
 
 }
 
+// Helper Function to iterate the pullRequests and update the Project Column
 async function addPRCardToColumn(cardsEndpoint, pullRequestId, authToken) {
     var options = {
         method: 'POST',
@@ -80,9 +72,8 @@ async function addPRCardToColumn(cardsEndpoint, pullRequestId, authToken) {
     }
 }
 
-// let cardEndpoint = 'https://api.github.com/projects/columns/8413851/cards';
-
-function constructPullReqListEndpoint() {
+// Function to construct Pull Request List Endpoint [GitHub APIs]
+function constructPullReqListEndpoint(REPO_URL) {
     let isValid = repoUrlRegex.test(REPO_URL);
     if (!isValid) {
         throw Error('Not A Valid Repo URL');
@@ -93,7 +84,8 @@ function constructPullReqListEndpoint() {
     return { pullReqListEndpoint: `https://api.github.com/repos/${type}/${uName}/pulls`, uName }
 }
 
-function constructProjectEndpoint() {
+// Function to construct Project Endpoint [GitHub APIs]
+function constructProjectEndpoint(PROJECT_URL) {
     let isValid = projectUrlRegex.test(PROJECT_URL)
     if (!isValid) {
         throw Error("Invalid Project URL");
@@ -104,24 +96,35 @@ function constructProjectEndpoint() {
     return { projectEndpoint: `https://api.github.com/${type}/${projectName}/projects` }
 }
 
-
-function constructAuthToken(uName) {
+// Helper Function to Construct Auth Token
+function constructAuthToken(uName, SECRET_TOKEN) {
     return Buffer.from(`${uName}:${SECRET_TOKEN}`).toString('base64');
 }
 
 async function main() {
     try {
-        let { projectEndpoint } = constructProjectEndpoint();
-        let { pullReqListEndpoint, uName } = constructPullReqListEndpoint();
+        // REPO_URL contains the repository URL
+        let REPO_URL = 'https://github.com/hercules-iitrpr/test-project-automation'
+        // PROJECT_URL contains the project URL
+        let PROJECT_URL = 'https://github.com/orgs/hercules-iitrpr/projects/1';
+        // COLUMN_NAME => column name into which Community Pull Requests Needs to be added 
+        let COLUMN_NAME = "In Progress (Community)";
+        let currentHours = new Date().getHours();
+        // SECRET_TOKEN contains the ACCESS TOKEN
+        let SECRET_TOKEN = '<--TEST-SECRET-TOKEN-->'
+        // Hours to consider
+        let HOURS_FLAG = 5
+        let { projectEndpoint } = constructProjectEndpoint(PROJECT_URL);
+        let { pullReqListEndpoint, uName } = constructPullReqListEndpoint(REPO_URL);
         console.log(`Project Endpoint ${projectEndpoint}`)
         console.log(`Pull Request List EndPoint ${pullReqListEndpoint}`);
-        let authToken = constructAuthToken(uName);
-        let columnEndpoint = await getColumnEndpoint(projectEndpoint);
+        let authToken = constructAuthToken(uName, SECRET_TOKEN);
+        let columnEndpoint = await getColumnEndpoint(projectEndpoint, PROJECT_URL);
         console.log(`Column Endpoint: ${columnEndpoint}`);
-        let cardEndpoint = await getCardEndpoint(columnEndpoint, authToken);
+        let cardEndpoint = await getCardEndpoint(columnEndpoint, authToken, COLUMN_NAME);
         console.log(`Card Endpoint: ${columnEndpoint}`);
         console.log(`Updating Pull Requests`);
-        await updatePullRequests(pullReqListEndpoint, cardEndpoint, authToken);
+        await updateProjectColumn(pullReqListEndpoint, cardEndpoint, authToken, COLUMN_NAME, currentHours, HOURS_FLAG);
         console.log('Updation Success');
     } catch (err) {
         console.log(err);
@@ -131,7 +134,7 @@ async function main() {
 }
 
 // Function returns the desired Card Endpoint after verifing its name with COLUMN_NAME 
-async function getCardEndpoint(columnEndpoint: string, authToken: string) {
+async function getCardEndpoint(columnEndpoint: string, authToken: string, COLUMN_NAME) {
     var options = {
         method: 'GET',
         headers: {
