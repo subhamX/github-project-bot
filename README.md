@@ -17,23 +17,17 @@ Name of an existing column of the project specifed above into which you want to 
 **`ACCESS_TOKEN:`**
 An Access Token to create new Project Card
 
-<br/>
-
-## Organization-scope project
-
+### Organization-scope project
 1. Set the URL of Organization-scope project to `PROJECT_URL`
 2. Set the name of an existing column of the project specifed above into which you want to place pull-requests to `COLUMN_NAME`
-3. Use ${{ secrets.MY_KEY }} to set the access token to `ACCESS_TOKEN`
+3. Use ${{ secrets.ACCESS_TOKEN }} to set the access token to `ACCESS_TOKEN`
 
-
-## Used Owned project
-
+### Used Owned project
 1. Set the URL of User owned project to `PROJECT_URL`
 2. Set the name of an existing column of the project into which you want to place pull-requests to `COLUMN_NAME`
-3. Use ${{ secrets.MY_KEY }} to set the access token to `ACCESS_TOKEN`
+3. Use ${{ secrets.ACCESS_TOKEN }} to set the access token to `ACCESS_TOKEN`
 
-
-## Example - 
+### Example - 
 Scheduling the workflow to run at specific UTC time using `cron`. 
 The following cron schedule expression will run `At every 5th minute from 0 through 59` and will run the following `TWO STEPS`
 ```
@@ -46,17 +40,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Handle Repo1
-      uses: subhamX/github@v1
-      env:
+      uses: subhamX/GitHub-Project-Bot@v1.0.0
+      with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         COLUMN_NAME: In Progress
-        PROJECT_URL: https://github.com/orgs/ORG/projects/1
-        REPO_URL: https://github.com/ORG/repo1
+        PROJECT_URL: https://github.com/orgs/ORG_NAME/projects/1
+        REPO_URL: https://github.com/ORG_NAME/repo1
     - name: Handle Repo2
-      uses: subhamX/github@v1
-      env:
+      uses: subhamX/GitHub-Project-Bot@v1.0.0
+      with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         COLUMN_NAME: In Progress
-        PROJECT_URL: https://github.com/orgs/ORG/projects/1
-        REPO_URL: https://github.com/ORG/repo2
+        PROJECT_URL: https://github.com/orgs/ORG_NAME/projects/1
+        REPO_URL: https://github.com/ORG_NAME/repo2
 ```
