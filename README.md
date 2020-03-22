@@ -1,20 +1,20 @@
 # GitHub Project Bot
-### Description: 🔰 `GitHub Project Bot` fetches recently created Pull Requests and updates the Project Column 🔰
+**Description:** 🔰 `GitHub Project Bot` fetches recently created Pull Requests and updates the Project Column 🔰
 
-This GitHub action allows you to use any webhook events to automate the process of updation of project cards with recently created `Pull Requests`
+**Usage:** This GitHub action allows you to use any webhook events to automate the process of updation of project cards with recently created `Pull Requests`
 
-## Inputs
+### Inputs
 
-### `REPO_URL`
+**`REPO_URL:`**
 Complete URL of Repository whose Pull Request you want to automate
 
-### `PROJECT_URL`
+**`PROJECT_URL:`**
 Complete URL of GitHub Project you want to use 
 
-### `COLUMN_NAME`
+**`COLUMN_NAME:`**
 Name of an existing column of the project specifed above into which you want to place pull-requests
 
-### `ACCESS_TOKEN`
+**`ACCESS_TOKEN:`**
 An Access Token to create new Project Card
 
 <br/>
