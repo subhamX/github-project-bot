@@ -1,0 +1,18 @@
+name: 'Scheduled Project Automation'
+description: 'Fetches recently created Pull Requests and updates them on Project by running every hour'
+inputs:
+  REPO_URL:  
+    description: 'REPO_URL contains the repository URL'
+    required: true
+  PROJECT_URL:  
+    description: 'PROJECT_URL contains the project URL'
+    required: true
+  COLUMN_NAME:  
+    description: 'Name of the column into which Pull Requests Needs to be added'
+    required: true
+  SECRET_TOKEN:  
+    description: 'SECRET_TOKEN contains the ACCESS TOKEN'
+    required: true
+runs:
+  using: 'node12'
+  main: 'index.js'
