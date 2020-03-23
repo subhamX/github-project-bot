@@ -1,5 +1,8 @@
 name: 'GitHub Project Bot'
-description: '🔰 GitHub Project Bot fetches recently created Pull Requests and updates Project Card 🔰'
+branding:
+  icon: 'award'  
+  color: 'yellow'
+description: '🥇 GitHub Project Bot fetches recently created Pull Requests and updates Project Card'
 inputs:
   REPO_URL:  
     description: 'REPO_URL: Repository URL'
