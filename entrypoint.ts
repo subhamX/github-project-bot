@@ -4,7 +4,6 @@ import * as index from './index';
 (async function main() {
     try {
         // REPO_URL contains the repository URL
-        // let REPO_URL = 'https://github.com/hercules-iitrpr/test-project-automation'
         let REPO_URL = core.getInput('REPO_URL');
         if (!REPO_URL) {
             throw Error('No REPO_URL passed')
@@ -14,7 +13,6 @@ import * as index from './index';
             REPO_URL = REPO_URL.slice(0, REPO_URL.length - 1);
         }
         // PROJECT_URL contains the project URL
-        // let PROJECT_URL = 'https://github.com/orgs/hercules-iitrpr/projects/1';
         let PROJECT_URL = core.getInput('PROJECT_URL');
         if (!PROJECT_URL) {
             throw Error('No PROJECT_URL passed')
@@ -24,13 +22,11 @@ import * as index from './index';
             PROJECT_URL = PROJECT_URL.slice(0, PROJECT_URL.length - 1);
         }
         // COLUMN_NAME => Name of the column into which Pull Requests Needs to be added 
-        // let COLUMN_NAME = "In Progress (Community)";
         let COLUMN_NAME = core.getInput('COLUMN_NAME');
         if (!COLUMN_NAME) {
             throw Error('No COLUMN_NAME passed')
         }
         // ACCESS_TOKEN contains the ACCESS TOKEN
-        // let ACCESS_TOKEN = '<--TEST-SECRET-TOKEN-->'
         let ACCESS_TOKEN = core.getInput('ACCESS_TOKEN');
         if (!ACCESS_TOKEN) {
             throw Error('No ACCESS_TOKEN passed')

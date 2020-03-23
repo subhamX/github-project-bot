@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Handle Repo1
-      uses: subhamX/GitHub-Project-Bot@v1.0.0
+      uses: subhamX/github-project-bot@v1.0.0
       with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         COLUMN_NAME: In Progress
@@ -50,7 +50,7 @@ jobs:
         REPO_URL: https://github.com/ORG_NAME/repo1
         # For User Owned Repo -> REPO_URL: https://github.com/UNAME/repo1
     - name: Handle Repo2
-      uses: subhamX/GitHub-Project-Bot@v1.0.0
+      uses: subhamX/github-project-bot@v1.0.0
       with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         COLUMN_NAME: In Progress

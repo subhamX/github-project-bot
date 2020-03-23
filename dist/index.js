@@ -463,7 +463,7 @@ var index = __webpack_require__(104);
                         throw Error('No ACCESS_TOKEN passed');
                     }
                     currentHours = new Date().getHours();
-                    HOURS_FLAG = 5;
+                    HOURS_FLAG = 24;
                     projectEndpoint = index.constructProjectEndpoint(PROJECT_URL).projectEndpoint;
                     _a = index.constructPullReqListEndpoint(REPO_URL), pullReqListEndpoint = _a.pullReqListEndpoint, uName = _a.uName;
                     console.log("Project Endpoint: " + projectEndpoint);
