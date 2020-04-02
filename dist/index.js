@@ -34,7 +34,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(523);
+/******/ 		return __webpack_require__(233);
 /******/ 	};
 /******/
 /******/ 	// run startup
@@ -58,7 +58,14 @@ module.exports = require("os");
 
 /***/ }),
 
-/***/ 104:
+/***/ 211:
+/***/ (function(module) {
+
+module.exports = require("https");
+
+/***/ }),
+
+/***/ 233:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
@@ -100,198 +107,70 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var fetch = __webpack_require__(844);
-// RegExp Expressions of correct repo and project URL
-var projectUrlRegex = /https:\/\/github.com\/(orgs|users)\/([^/]+)\/projects\/([\d]+)\/?/;
-var repoUrlRegex = /https:\/\/github.com\/([^/]+)\/([^/]+)\/?/;
-// Function to iterate the pullRequests and update the Project Column
-function updateProjectColumn(pullReqListEndpoint, cardEndpoint, authToken, COLUMN_NAME, currentHours, HOURS_FLAG) {
+var core = __webpack_require__(556);
+var index = __webpack_require__(474);
+(function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var res, json, _i, json_1, pullReq, createdAtHours, hoursDiff, err_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var REPO_URL, PROJECT_URL, COLUMN_NAME, ACCESS_TOKEN, currentHours, HOURS_FLAG, projectEndpoint, _a, pullReqListEndpoint, uName, authToken, columnEndpoint, cardEndpoint, err_1;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
-                    _a.trys.push([0, 7, , 8]);
-                    return [4 /*yield*/, fetch(pullReqListEndpoint, {})];
+                    _b.trys.push([0, 4, , 5]);
+                    REPO_URL = core.getInput('REPO_URL');
+                    if (!REPO_URL) {
+                        throw Error('No REPO_URL passed');
+                    }
+                    // Removing last backslash if it is present
+                    if (REPO_URL[REPO_URL.length - 1] === '/') {
+                        REPO_URL = REPO_URL.slice(0, REPO_URL.length - 1);
+                    }
+                    PROJECT_URL = core.getInput('PROJECT_URL');
+                    if (!PROJECT_URL) {
+                        throw Error('No PROJECT_URL passed');
+                    }
+                    // Removing last backslash if it is present
+                    if (PROJECT_URL[PROJECT_URL.length - 1] === '/') {
+                        PROJECT_URL = PROJECT_URL.slice(0, PROJECT_URL.length - 1);
+                    }
+                    COLUMN_NAME = core.getInput('COLUMN_NAME');
+                    if (!COLUMN_NAME) {
+                        throw Error('No COLUMN_NAME passed');
+                    }
+                    ACCESS_TOKEN = core.getInput('ACCESS_TOKEN');
+                    if (!ACCESS_TOKEN) {
+                        throw Error('No ACCESS_TOKEN passed');
+                    }
+                    currentHours = new Date().getHours();
+                    HOURS_FLAG = 24;
+                    projectEndpoint = index.constructProjectEndpoint(PROJECT_URL).projectEndpoint;
+                    _a = index.constructPullReqListEndpoint(REPO_URL), pullReqListEndpoint = _a.pullReqListEndpoint, uName = _a.uName;
+                    core.info("Project Endpoint: " + projectEndpoint);
+                    core.info("Pull Request List EndPoint: " + pullReqListEndpoint);
+                    authToken = index.constructAuthToken(uName, ACCESS_TOKEN);
+                    return [4 /*yield*/, index.getColumnEndpoint(projectEndpoint, PROJECT_URL)];
                 case 1:
-                    res = _a.sent();
-                    return [4 /*yield*/, res.json()];
+                    columnEndpoint = _b.sent();
+                    core.info("Column Endpoint: " + columnEndpoint);
+                    return [4 /*yield*/, index.getCardEndpoint(columnEndpoint, authToken, COLUMN_NAME)];
                 case 2:
-                    json = _a.sent();
-                    _i = 0, json_1 = json;
-                    _a.label = 3;
+                    cardEndpoint = _b.sent();
+                    core.info("Card Endpoint: " + columnEndpoint);
+                    core.info("Updating Pull Requests");
+                    return [4 /*yield*/, index.updateProjectColumn(pullReqListEndpoint, cardEndpoint, authToken, COLUMN_NAME, currentHours, HOURS_FLAG)];
                 case 3:
-                    if (!(_i < json_1.length)) return [3 /*break*/, 6];
-                    pullReq = json_1[_i];
-                    createdAtHours = new Date(pullReq["created_at"]).getHours();
-                    hoursDiff = currentHours - createdAtHours;
-                    if (!(hoursDiff <= HOURS_FLAG)) return [3 /*break*/, 5];
-                    // Adding PR Card To Column
-                    console.log("Adding [PR Title: " + pullReq['title'] + "] into: [Column Name: " + COLUMN_NAME + "]");
-                    return [4 /*yield*/, addPRCardToColumn(cardEndpoint, pullReq["id"], authToken)];
+                    _b.sent();
+                    core.info('Update Success');
+                    return [3 /*break*/, 5];
                 case 4:
-                    _a.sent();
-                    _a.label = 5;
-                case 5:
-                    _i++;
-                    return [3 /*break*/, 3];
-                case 6: return [3 /*break*/, 8];
-                case 7:
-                    err_1 = _a.sent();
-                    console.log(err_1);
-                    return [3 /*break*/, 8];
-                case 8: return [2 /*return*/];
+                    err_1 = _b.sent();
+                    core.error(err_1);
+                    return [3 /*break*/, 5];
+                case 5: return [2 /*return*/];
             }
         });
     });
-}
-exports.updateProjectColumn = updateProjectColumn;
-// Function verifies the projectEndpoint and returns the columnEndpoint of desired project
-function getColumnEndpoint(projectEndpoint, PROJECT_URL) {
-    return __awaiter(this, void 0, void 0, function () {
-        var res, json, project;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch(projectEndpoint, {
-                        'headers': {
-                            'Accept': 'application/vnd.github.inertia-preview+json'
-                        }
-                    })];
-                case 1:
-                    res = _a.sent();
-                    return [4 /*yield*/, res.json()];
-                case 2:
-                    json = _a.sent();
-                    if (json["message"] === 'Not Found') {
-                        // Invalid Project Associated With The User
-                        throw new Error("No Projects Associated With The User");
-                    }
-                    project = json.find(function (e) {
-                        return e.html_url == PROJECT_URL;
-                    });
-                    if (project) {
-                        return [2 /*return*/, project["columns_url"]];
-                    }
-                    else {
-                        // Invalid Project URL
-                        throw new Error("Project URL doesn't exist");
-                    }
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-exports.getColumnEndpoint = getColumnEndpoint;
-// Helper Function to iterate the pullRequests and update the Project Column
-function addPRCardToColumn(cardsEndpoint, pullRequestId, authToken) {
-    return __awaiter(this, void 0, void 0, function () {
-        var options, res, json;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    options = {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/vnd.github.inertia-preview+json',
-                            'Authorization': "Basic " + authToken
-                        },
-                        body: JSON.stringify({
-                            "content_type": "PullRequest",
-                            "content_id": pullRequestId
-                        })
-                    };
-                    return [4 /*yield*/, fetch(cardsEndpoint, options)];
-                case 1:
-                    res = _a.sent();
-                    return [4 /*yield*/, res.json()];
-                case 2:
-                    json = _a.sent();
-                    if (json['errors']) {
-                        console.log("Error while adding Pull Request Card To Column [" + json['errors'][0]['message'] + "]");
-                    }
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-exports.addPRCardToColumn = addPRCardToColumn;
-// Function to construct Pull Request List Endpoint [GitHub APIs]
-function constructPullReqListEndpoint(REPO_URL) {
-    var isValid = repoUrlRegex.test(REPO_URL);
-    if (!isValid) {
-        throw Error('Not A Valid Repo URL');
-    }
-    var projectMeta = REPO_URL.replace('https://github.com/', '').split('/');
-    var type = projectMeta[0];
-    var uName = projectMeta[1];
-    return { pullReqListEndpoint: "https://api.github.com/repos/" + type + "/" + uName + "/pulls", uName: uName };
-}
-exports.constructPullReqListEndpoint = constructPullReqListEndpoint;
-// Function to construct Project Endpoint [GitHub APIs]
-function constructProjectEndpoint(PROJECT_URL) {
-    var isValid = projectUrlRegex.test(PROJECT_URL);
-    if (!isValid) {
-        throw Error("Invalid Project URL");
-    }
-    var projectMeta = PROJECT_URL.replace('https://github.com/', '').split('/');
-    var type = projectMeta[0];
-    var projectName = projectMeta[1];
-    return { projectEndpoint: "https://api.github.com/" + type + "/" + projectName + "/projects" };
-}
-exports.constructProjectEndpoint = constructProjectEndpoint;
-// Helper Function to Construct Auth Token
-function constructAuthToken(uName, ACCESS_TOKEN) {
-    return Buffer.from(uName + ":" + ACCESS_TOKEN).toString('base64');
-}
-exports.constructAuthToken = constructAuthToken;
-// Function returns the desired Card Endpoint after verifing its name with COLUMN_NAME 
-function getCardEndpoint(columnEndpoint, authToken, COLUMN_NAME) {
-    return __awaiter(this, void 0, void 0, function () {
-        var options, res, json, column;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    options = {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/vnd.github.inertia-preview+json',
-                            'Authorization': "Basic " + authToken
-                        }
-                    };
-                    return [4 /*yield*/, fetch(columnEndpoint, options)];
-                case 1:
-                    res = _a.sent();
-                    return [4 /*yield*/, res.json()];
-                case 2:
-                    json = _a.sent();
-                    if (json.length == 0) {
-                        // No Column In The Project
-                        throw new Error('No Column In The Project');
-                    }
-                    column = json.find(function (e) {
-                        return e.name == COLUMN_NAME;
-                    });
-                    if (column) {
-                        return [2 /*return*/, column["cards_url"]];
-                    }
-                    else {
-                        // No column exist with the given COLUMN_NAME
-                        throw new Error('No column exist with the given COLUMN_NAME');
-                    }
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-exports.getCardEndpoint = getCardEndpoint;
+})();
 
-
-/***/ }),
-
-/***/ 211:
-/***/ (function(module) {
-
-module.exports = require("https");
 
 /***/ }),
 
@@ -387,7 +266,7 @@ function escapeProperty(s) {
 
 /***/ }),
 
-/***/ 523:
+/***/ 474:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
@@ -429,70 +308,208 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+var fetch = __webpack_require__(844);
 var core = __webpack_require__(556);
-var index = __webpack_require__(104);
-(function main() {
+// RegExp Expressions of correct repo and project URL
+var projectUrlRegex = /https:\/\/github.com\/(orgs|users)\/([^/]+)\/projects\/([\d]+)\/?/;
+var repoUrlRegex = /https:\/\/github.com\/([^/]+)\/([^/]+)\/?/;
+// Function to iterate the pullRequests and update the Project Column
+function updateProjectColumn(pullReqListEndpoint, cardEndpoint, authToken, COLUMN_NAME, currentHours, HOURS_FLAG) {
     return __awaiter(this, void 0, void 0, function () {
-        var REPO_URL, PROJECT_URL, COLUMN_NAME, ACCESS_TOKEN, currentHours, HOURS_FLAG, projectEndpoint, _a, pullReqListEndpoint, uName, authToken, columnEndpoint, cardEndpoint, err_1;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var res, json, _i, json_1, pullReq, createdAtHours, hoursDiff, res_1, err_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
-                    _b.trys.push([0, 4, , 5]);
-                    REPO_URL = core.getInput('REPO_URL');
-                    if (!REPO_URL) {
-                        throw Error('No REPO_URL passed');
-                    }
-                    // Removing last backslash if it is present
-                    if (REPO_URL[REPO_URL.length - 1] === '/') {
-                        REPO_URL = REPO_URL.slice(0, REPO_URL.length - 1);
-                    }
-                    PROJECT_URL = core.getInput('PROJECT_URL');
-                    if (!PROJECT_URL) {
-                        throw Error('No PROJECT_URL passed');
-                    }
-                    // Removing last backslash if it is present
-                    if (PROJECT_URL[PROJECT_URL.length - 1] === '/') {
-                        PROJECT_URL = PROJECT_URL.slice(0, PROJECT_URL.length - 1);
-                    }
-                    COLUMN_NAME = core.getInput('COLUMN_NAME');
-                    if (!COLUMN_NAME) {
-                        throw Error('No COLUMN_NAME passed');
-                    }
-                    ACCESS_TOKEN = core.getInput('ACCESS_TOKEN');
-                    if (!ACCESS_TOKEN) {
-                        throw Error('No ACCESS_TOKEN passed');
-                    }
-                    currentHours = new Date().getHours();
-                    HOURS_FLAG = 24;
-                    projectEndpoint = index.constructProjectEndpoint(PROJECT_URL).projectEndpoint;
-                    _a = index.constructPullReqListEndpoint(REPO_URL), pullReqListEndpoint = _a.pullReqListEndpoint, uName = _a.uName;
-                    console.log("Project Endpoint: " + projectEndpoint);
-                    console.log("Pull Request List EndPoint: " + pullReqListEndpoint);
-                    authToken = index.constructAuthToken(uName, ACCESS_TOKEN);
-                    return [4 /*yield*/, index.getColumnEndpoint(projectEndpoint, PROJECT_URL)];
+                    _a.trys.push([0, 7, , 8]);
+                    return [4 /*yield*/, fetch(pullReqListEndpoint, {})];
                 case 1:
-                    columnEndpoint = _b.sent();
-                    console.log("Column Endpoint: " + columnEndpoint);
-                    return [4 /*yield*/, index.getCardEndpoint(columnEndpoint, authToken, COLUMN_NAME)];
+                    res = _a.sent();
+                    return [4 /*yield*/, res.json()];
                 case 2:
-                    cardEndpoint = _b.sent();
-                    console.log("Card Endpoint: " + columnEndpoint);
-                    console.log("Updating Pull Requests");
-                    return [4 /*yield*/, index.updateProjectColumn(pullReqListEndpoint, cardEndpoint, authToken, COLUMN_NAME, currentHours, HOURS_FLAG)];
+                    json = _a.sent();
+                    _i = 0, json_1 = json;
+                    _a.label = 3;
                 case 3:
-                    _b.sent();
-                    console.log('Updation Success');
-                    return [3 /*break*/, 5];
+                    if (!(_i < json_1.length)) return [3 /*break*/, 6];
+                    pullReq = json_1[_i];
+                    createdAtHours = new Date(pullReq["created_at"]).getHours();
+                    hoursDiff = currentHours - createdAtHours;
+                    if (!(hoursDiff <= HOURS_FLAG)) return [3 /*break*/, 5];
+                    return [4 /*yield*/, addPRCardToColumn(cardEndpoint, pullReq["id"], authToken)];
                 case 4:
-                    err_1 = _b.sent();
-                    console.log(err_1);
-                    console.log("Exiting");
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
+                    res_1 = _a.sent();
+                    if (!res_1.error) {
+                        if (!res_1.already_added) {
+                            // Successfully added
+                            core.info("Added [PR Title: " + pullReq['title'] + "]");
+                        }
+                    }
+                    else {
+                        core.info("Failed to Add [PR Title: " + pullReq['title'] + "]");
+                        core.error(res_1.message);
+                    }
+                    _a.label = 5;
+                case 5:
+                    _i++;
+                    return [3 /*break*/, 3];
+                case 6: return [3 /*break*/, 8];
+                case 7:
+                    err_1 = _a.sent();
+                    core.info(err_1);
+                    return [3 /*break*/, 8];
+                case 8: return [2 /*return*/];
             }
         });
     });
-})();
+}
+exports.updateProjectColumn = updateProjectColumn;
+// Function verifies the projectEndpoint and returns the columnEndpoint of desired project
+function getColumnEndpoint(projectEndpoint, PROJECT_URL) {
+    return __awaiter(this, void 0, void 0, function () {
+        var res, json, project;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, fetch(projectEndpoint, {
+                        'headers': {
+                            'Accept': 'application/vnd.github.inertia-preview+json'
+                        }
+                    })];
+                case 1:
+                    res = _a.sent();
+                    return [4 /*yield*/, res.json()];
+                case 2:
+                    json = _a.sent();
+                    if (json["message"] === 'Not Found') {
+                        // Invalid Project Associated With The User
+                        throw new Error("No Projects Associated With The User");
+                    }
+                    project = json.find(function (e) {
+                        return e.html_url == PROJECT_URL;
+                    });
+                    if (project) {
+                        return [2 /*return*/, project["columns_url"]];
+                    }
+                    else {
+                        // Invalid Project URL
+                        throw new Error("Project URL doesn't exist");
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.getColumnEndpoint = getColumnEndpoint;
+// Helper Function to iterate the pullRequests and update the Project Column
+function addPRCardToColumn(cardsEndpoint, pullRequestId, authToken) {
+    return __awaiter(this, void 0, void 0, function () {
+        var options, res, json;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    options = {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/vnd.github.inertia-preview+json',
+                            'Authorization': "Basic " + authToken
+                        },
+                        body: JSON.stringify({
+                            "content_type": "PullRequest",
+                            "content_id": pullRequestId
+                        })
+                    };
+                    return [4 /*yield*/, fetch(cardsEndpoint, options)];
+                case 1:
+                    res = _a.sent();
+                    return [4 /*yield*/, res.json()];
+                case 2:
+                    json = _a.sent();
+                    if (json['errors']) {
+                        if (json['errors'][0]['message'] == 'Project already has the associated issue') {
+                            // PR is already linked to the project
+                            return [2 /*return*/, { 'error': false, 'already_added': true }];
+                        }
+                        else {
+                            return [2 /*return*/, { 'error': true, 'message': json['errors'][0]['message'], 'already_added': false }];
+                        }
+                    }
+                    else {
+                        return [2 /*return*/, { 'error': false }];
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.addPRCardToColumn = addPRCardToColumn;
+// Function to construct Pull Request List Endpoint [GitHub APIs]
+function constructPullReqListEndpoint(REPO_URL) {
+    var isValid = repoUrlRegex.test(REPO_URL);
+    if (!isValid) {
+        throw Error('Not A Valid Repo URL');
+    }
+    var projectMeta = REPO_URL.replace('https://github.com/', '').split('/');
+    var type = projectMeta[0];
+    var uName = projectMeta[1];
+    return { pullReqListEndpoint: "https://api.github.com/repos/" + type + "/" + uName + "/pulls", uName: uName };
+}
+exports.constructPullReqListEndpoint = constructPullReqListEndpoint;
+// Function to construct Project Endpoint [GitHub APIs]
+function constructProjectEndpoint(PROJECT_URL) {
+    var isValid = projectUrlRegex.test(PROJECT_URL);
+    if (!isValid) {
+        throw Error("Invalid Project URL");
+    }
+    var projectMeta = PROJECT_URL.replace('https://github.com/', '').split('/');
+    var type = projectMeta[0];
+    var projectName = projectMeta[1];
+    return { projectEndpoint: "https://api.github.com/" + type + "/" + projectName + "/projects" };
+}
+exports.constructProjectEndpoint = constructProjectEndpoint;
+// Helper Function to Construct Auth Token
+function constructAuthToken(uName, ACCESS_TOKEN) {
+    return Buffer.from(uName + ":" + ACCESS_TOKEN).toString('base64');
+}
+exports.constructAuthToken = constructAuthToken;
+// Function returns the desired Card Endpoint after verifing its name with COLUMN_NAME 
+function getCardEndpoint(columnEndpoint, authToken, COLUMN_NAME) {
+    return __awaiter(this, void 0, void 0, function () {
+        var options, res, json, column;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    options = {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/vnd.github.inertia-preview+json',
+                            'Authorization': "Basic " + authToken
+                        },
+                    };
+                    return [4 /*yield*/, fetch(columnEndpoint, options)];
+                case 1:
+                    res = _a.sent();
+                    return [4 /*yield*/, res.json()];
+                case 2:
+                    json = _a.sent();
+                    if (json.length == 0) {
+                        // No Column In The Project
+                        throw new Error('No Column In The Project');
+                    }
+                    column = json.find(function (e) {
+                        return e.name == COLUMN_NAME;
+                    });
+                    if (column) {
+                        return [2 /*return*/, column["cards_url"]];
+                    }
+                    else {
+                        // No column exist with the given COLUMN_NAME
+                        throw new Error('No column exist with the given COLUMN_NAME');
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.getCardEndpoint = getCardEndpoint;
 
 
 /***/ }),

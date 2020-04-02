@@ -38,18 +38,17 @@ import * as index from './index';
 
         let { projectEndpoint } = index.constructProjectEndpoint(PROJECT_URL);
         let { pullReqListEndpoint, uName } = index.constructPullReqListEndpoint(REPO_URL);
-        console.log(`Project Endpoint: ${projectEndpoint}`)
-        console.log(`Pull Request List EndPoint: ${pullReqListEndpoint}`);
+        core.info(`Project Endpoint: ${projectEndpoint}`)
+        core.info(`Pull Request List EndPoint: ${pullReqListEndpoint}`);
         let authToken = index.constructAuthToken(uName, ACCESS_TOKEN);
         let columnEndpoint = await index.getColumnEndpoint(projectEndpoint, PROJECT_URL);
-        console.log(`Column Endpoint: ${columnEndpoint}`);
+        core.info(`Column Endpoint: ${columnEndpoint}`);
         let cardEndpoint = await index.getCardEndpoint(columnEndpoint, authToken, COLUMN_NAME);
-        console.log(`Card Endpoint: ${columnEndpoint}`);
-        console.log(`Updating Pull Requests`);
+        core.info(`Card Endpoint: ${columnEndpoint}`);
+        core.info(`Updating Pull Requests`);
         await index.updateProjectColumn(pullReqListEndpoint, cardEndpoint, authToken, COLUMN_NAME, currentHours, HOURS_FLAG);
-        console.log('Updation Success');
+        core.info('Update Success');
     } catch (err) {
-        console.log(err);
-        console.log("Exiting");
+        core.error(err);
     }
 })()
